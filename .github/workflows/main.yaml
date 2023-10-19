@@ -1,4 +1,5 @@
 name: test get tag
+run-name: test-runname
 on:
   push:
     tags:
@@ -13,15 +14,15 @@ jobs:
       - name: check rc
         id: check-rc
         run: |
-          is-rc=false
+          is_rc=false
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
           for tag in $tags; do
             if [[ $tag == "${GITHUB_REF_NAME}rc."* ]]; then
-              is-rc=true
+              is_rc=true
             fi
           done
-          echo "is-candidate=$is-rc" >> "$GITHUB_OUTPUT"
+          echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
       - name: deploy prod
         id: deploy-prod
         if: steps.check-rc.outputs.is-candidate
