@@ -5,26 +5,40 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
-  t:
-    name: test-actions
+  checkRC:
     runs-on: ubuntu-latest
+    outputs:
+      isCandidate: ${{ steps.check-rc.outputs.is-candidate }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
       - name: check rc
         id: check-rc
         run: |
-          is_rc=false
+          is_rc='false'
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
           for tag in $tags; do
             if [[ $tag == "${GITHUB_REF_NAME}rc."* ]]; then
-              is_rc=true
+              is_rc='true'
             fi
           done
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
+  deployProd:
+    runs-on: ubuntu-latest
+    needs: checkRC
+    if: needs.checkRC.outputs.isCandidate == 'true'
+    steps:
       - name: deploy prod
         id: deploy-prod
-        if: steps.check-rc.outputs.is-candidate
         run: |
           echo "success"
+  notDeployProd:
+    runs-on: ubuntu-latest
+    needs: checkRC
+    if: needs.checkRC.outputs.isCandidate == 'false'
+    steps:
+      - name: deploy prod
+        id: deploy-prod
+        run: |
+          echo "failed"
