@@ -25,8 +25,10 @@ jobs:
           done
           echo ${GITHUB_SHA}
           echo ${GITHUB_REF_NAME}
-          echo ($(git tag --points-at ${GITHUB_SHA}))
+          echo ($(git tag --points-at 2ca3c1f9359ce7617110b6e3e69f9640046fa76f))
           echo $tags
+          echo $tags[0]
+          echo $tags[1]
           echo $is_rc
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
   deployProd:
