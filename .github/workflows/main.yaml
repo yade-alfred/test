@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.sha }}
+          fetch-tags: true
       - name: check rc
         id: check-rc
         run: |
