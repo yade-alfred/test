@@ -23,6 +23,10 @@ jobs:
               is_rc='true'
             fi
           done
+          echo ${GITHUB_SHA}
+          echo ${GITHUB_REF_NAME}
+          echo $tags
+          echo $is_rc
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
   deployProd:
     runs-on: ubuntu-latest
