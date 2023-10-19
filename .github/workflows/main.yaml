@@ -12,21 +12,23 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.sha }}
       - name: check rc
         id: check-rc
         run: |
-          is_rc=false
+          is_rc='false'
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
           for tag in $tags; do
             if [[ $tag == "${GITHUB_REF_NAME}rc."* ]]; then
-              is_rc=true
+              is_rc='true'
             fi
           done
           echo ${GITHUB_SHA}
           echo ${GITHUB_REF_NAME}
           echo $(git tag --points-at 2ca3c1f9359ce7617110b6e3e69f9640046fa76f)
-          git tag --points-at 2ca3c1f9359ce7617110b6e3e69f9640046fa76f
+          git tag --points-at ${GITHUB_SHA}
           echo $tags
           echo $tags[0]
           echo $tags[1]
@@ -35,7 +37,7 @@ jobs:
   deployProd:
     runs-on: ubuntu-latest
     needs: checkRC
-    if: needs.checkRC.outputs.isCandidate == true
+    if: needs.checkRC.outputs.isCandidate == 'true'
     steps:
       - name: deploy prod
         id: deploy-prod
@@ -44,7 +46,7 @@ jobs:
   notDeployProd:
     runs-on: ubuntu-latest
     needs: checkRC
-    if: needs.checkRC.outputs.isCandidate == false
+    if: needs.checkRC.outputs.isCandidate == 'false'
     steps:
       - name: deploy prod
         id: deploy-prod
