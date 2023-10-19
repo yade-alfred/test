@@ -11,7 +11,7 @@ jobs:
       isCandidate: ${{ steps.check-rc.outputs.is-candidate }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-tags: true
       - name: check rc
