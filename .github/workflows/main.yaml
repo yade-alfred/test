@@ -20,17 +20,14 @@ jobs:
           is_rc='false'
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
-          for tag in $tags; do
+          for tag in $tags; done
+            echo $tag
+            echo "${GITHUB_REF_NAME}-rc."
+            echo '-'
             if [[ $tag == "${GITHUB_REF_NAME}-rc."* ]]; then
               is_rc='true'
             fi
           done
-          echo ${GITHUB_SHA}
-          echo ${GITHUB_REF_NAME}
-          git tag --points-at ${GITHUB_SHA}
-          echo $tags
-          echo ${tags[0]}
-          echo ${tags[1]}
           echo $is_rc
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
   deployProd:
