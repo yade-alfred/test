@@ -20,7 +20,7 @@ jobs:
           is_rc='false'
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
-          for tag in $tags; done
+          for tag in $tags; do
             echo $tag
             echo "${GITHUB_REF_NAME}-rc."
             echo '-'
