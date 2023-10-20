@@ -37,12 +37,14 @@ jobs:
         with:
           ref: ${{ env.tag_name }}
         if: steps.image-status-check.outputs.hasImage != 'true'
-      - name: Output error summary
+      - name: Output error summary and remove tag
         if: steps.image-status-check.outputs.hasImage != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "### This commit's image is not ready for deploy" >> $GITHUB_STEP_SUMMARY
+          git push --delete origin ${{ env.tag_name }}
+          echo "Remove tag ${{ env.tag_name }}" >> $GITHUB_STEP_SUMMARY
           gh run cancel ${{ github.run_id }}
           gh run watch ${{ github.run_id }}
   checkReleaseCandidateJob:
@@ -77,7 +79,7 @@ jobs:
         run: |
           echo "### This commit is not release candidate" >> $GITHUB_STEP_SUMMARY
           git push --delete origin ${{ env.tag_name }}
-          echo "Remove tag ${GITHUB_REF_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "Remove tag ${{ env.tag_name }}" >> $GITHUB_STEP_SUMMARY
           gh run cancel ${{ github.run_id }}
           gh run watch ${{ github.run_id }}
   deployProdJob:
