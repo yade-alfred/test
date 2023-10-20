@@ -44,7 +44,9 @@ jobs:
     needs: checkRC
     if: needs.checkRC.outputs.isCandidate == 'false'
     steps:
-      - name: deploy prod
-        id: deploy-prod
+      - name: remove-tag
+        id: remove-tag
         run: |
+          git push --delete origin {{ github.ref_name }}
+          core.setFailed('This commit is not release candidate')
           echo "failed"
