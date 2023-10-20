@@ -14,7 +14,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
       - name: Fetch tags
-        run: git fetch origin tag ${{ github.ref_name}}*
+        run: git fetch origin tag ${{ github.ref_name }}*
       - name: Check release candidate
         id: check-rc
         run: |
@@ -36,27 +36,38 @@ jobs:
           git push --delete origin ${{ github.ref_name }}
           echo "Remove tag ${GITHUB_REF_NAME}" >> $GITHUB_STEP_SUMMARY
           gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
   deployProd:
     runs-on: ubuntu-latest
     needs: checkReleaseCandidate
     if: needs.checkReleaseCandidate.outputs.isCandidate == 'true'
     steps:
+      - uses: actions/checkout@v1
+      - name: Create Github deployment
+        uses: chrnorm/deployment-action@v2
+        id: create-deployment
+        with:
+          token: '${{ github.token }}'
+          environment: 'prod'
+          auto-merge: false
+          ref: ${{ github.ref_name }}
+          required-contexts: [ 'checkReleaseCandidate' ]
       - name: Deploy prod
         id: deploy-prod
         run: |
           echo "success"
-      - name: Set deployment
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository }}/deployments \
-            -f ref='${{ github.ref }}' \
-            -f task='abc' \
-            -f auto_merge=false \
-            -f payload='{ "deploy": "migratea" }' \
-            -f environment='prod' \
-            -f description='Deploy P: ${{ github.ref_name }}'
+      - name: Update deployment success
+        if: success()
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: '${{ github.token }}'
+          deployment-id: ${{ steps.create-deployment.outputs.deployment_id }}
+          state: 'success'
+      - name: Update deployment failure
+        if: failure()
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: '${{ github.token }}'
+          deployment-id: ${{ steps.create-deployment.outputs.deployment_id }}
+          log-url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          state: 'failure'
