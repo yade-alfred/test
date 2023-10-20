@@ -1,21 +1,22 @@
-name: test get tag
-run-name: test-runname
+name: Deploy Prod
+run-name: Deploy Prod: ${{ github.ref_name }}
 on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
-  checkRC:
+  checkReleaseCandidate:
     runs-on: ubuntu-latest
     concurrency: deploy-prod-group
+    enviroment: prod
     outputs:
-      isCandidate: ${{ steps.check-rc.outputs.is-candidate }}
+      isCandidate: ${{ steps.check-rc.outputs.isCandidate }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
       - name: Fetch tags
         run: git fetch origin tag ${{ github.ref_name}}*
-      - name: check rc
+      - name: Check release candidate
         id: check-rc
         run: |
           is_rc='false'
@@ -26,20 +27,20 @@ jobs:
               is_rc='true'
             fi
           done
-          echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
-      - name: remvoe-tag
-        if: steps.check-rc.outputs.is-candidate == 'false'
+          echo "isCandidate=$is_rc" >> "$GITHUB_OUTPUT"
+      - name: Remvoe tag
+        if: steps.check-rc.outputs.isCandidate == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "### This commit is not release candidate" >> $GITHUB_STEP_SUMMARY
           git push --delete origin ${{ github.ref_name }}
-          echo "This commit is not release candidate" >> $GITHUB_STEP_SUMMARY
+          echo "Remove tag ${GITHUB_REF_NAME}" >> $GITHUB_STEP_SUMMARY
           gh run cancel ${{ github.run_id }}
-
   deployProd:
     runs-on: ubuntu-latest
-    needs: checkRC
-    if: needs.checkRC.outputs.isCandidate == 'true'
+    needs: checkReleaseCandidate
+    if: needs.checkReleaseCandidate.outputs.isCandidate == 'true'
     steps:
       - name: deploy prod
         id: deploy-prod
