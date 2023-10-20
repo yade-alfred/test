@@ -12,9 +12,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          fetch-tags: true
-          fetch-depth: 5
+      - name: Fetch tags
+        run: git fetch --tags
       - name: check rc
         id: check-rc
         run: |
@@ -22,7 +21,7 @@ jobs:
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
           for tag in $tags; do
-            if [[ $tag == "${GITHUB_REF_NAME}rc."* ]]; then
+            if [[ $tag == "${GITHUB_REF_NAME}-rc."* ]]; then
               is_rc='true'
             fi
           done
