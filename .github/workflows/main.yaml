@@ -7,6 +7,8 @@ on:
 jobs:
   checkRC:
     runs-on: ubuntu-latest
+    permissions:
+    contents: write
     outputs:
       isCandidate: ${{ steps.check-rc.outputs.is-candidate }}
     steps:
@@ -21,20 +23,16 @@ jobs:
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
           for tag in ${tags[@]}; do
-            echo $tag
-            echo "${GITHUB_REF_NAME}-rc."
-            echo '-'
             if [[ $tag == "${GITHUB_REF_NAME}-rc."* ]]; then
               is_rc='true'
             fi
           done
-          echo $is_rc
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
       - name: remvoe-tag
         if: steps.check-rc.outputs.is-candidate == 'false'
         run: |
           git push --delete origin {{ github.ref_name }}
-          core.setFailed('This commit is not release candidate')
+          echo "::error::This commit is not release candidate"
   deployProd:
     runs-on: ubuntu-latest
     needs: checkRC
