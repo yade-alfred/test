@@ -1,0 +1,18 @@
+name: Build Image and push
+on:
+  push:
+    branches:
+      - main
+jobs:
+  buildImageJob:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run the action # You would run your tests before this using the output to set state/desc
+        if: success()
+        uses: Sibz/github-status-action@v1
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          description: 'Build image and push success'
+          context: 'BuildImage'
+          state: 'success'
