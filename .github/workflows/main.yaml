@@ -7,8 +7,6 @@ on:
 jobs:
   checkRC:
     runs-on: ubuntu-latest
-    permissions:
-    contents: write
     outputs:
       isCandidate: ${{ steps.check-rc.outputs.is-candidate }}
     steps:
