@@ -8,6 +8,6 @@ on:
 jobs:
   deployProdJobs:
     runs-on: ubuntu-latest
-    uses: ./github/workflows/deploy.yaml
+    uses: ./.github/workflows/deploy.yaml
     with:
       environment: prod
