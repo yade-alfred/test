@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        required: true
+env:
+  tag_name: ${{ inputs.tag_name || github.ref_name }}
 jobs:
   checkImageExistsJob:
     runs-on: ubuntu-latest
@@ -20,18 +26,18 @@ jobs:
           arr=($(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/${{ github.repository }}/commits/${{ github.ref_name }}/statuses \
+            /repos/${{ github.repository }}/commits/${{ env.tag_name }}/statuses \
             | jq -c '.[] | [.context, .state]'))
-          echo ${arr[0]}
           for row in ${arr[@]}; do
             if [[ $(echo $row | jq -r '.[0]') == "BuildImage" && $(echo $row | jq -r '.[1]') == "success" ]]; then
               has_image='true'
             fi
           done
-          echo $has_image
           echo "hasImage=$has_image" >> $GITHUB_OUTPUT
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.tag_name }}
         if: steps.image-status-check.outputs.hasImage != 'true'
       - name: Output error summary
         if: steps.image-status-check.outputs.hasImage != 'true'
@@ -50,16 +56,18 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.tag_name }}
       - name: Fetch tags
-        run: git fetch origin tag ${{ github.ref_name }}*
+        run: git fetch origin tag ${{ env.tag_name }}*
       - name: Check release candidate
         id: check-rc
         run: |
           is_rc='false'
           IFS=$'\n'
-          tags=($(git tag --points-at ${GITHUB_SHA}))
+          tags=($(git tag --points-at ${{ env.tag_name }}))
           for tag in ${tags[@]}; do
-            if [[ $tag == "${GITHUB_REF_NAME}-rc."* ]]; then
+            if [[ $tag == "${{ env.tag_name }}-rc."* ]]; then
               is_rc='true'
             fi
           done
@@ -70,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "### This commit is not release candidate" >> $GITHUB_STEP_SUMMARY
-          git push --delete origin ${{ github.ref_name }}
+          git push --delete origin ${{ env.tag_name }}
           echo "Remove tag ${GITHUB_REF_NAME}" >> $GITHUB_STEP_SUMMARY
           gh run cancel ${{ github.run_id }}
           gh run watch ${{ github.run_id }}
@@ -81,6 +89,8 @@ jobs:
     if: needs.checkReleaseCandidateJob.outputs.isCandidate == 'true'
     steps:
       - uses: actions/checkout@v1
+        with:
+          ref: ${{ env.tag_name }}
       - name: Create Github deployment
         uses: chrnorm/deployment-action@v2
         id: create-deployment
@@ -88,7 +98,7 @@ jobs:
           token: '${{ github.token }}'
           environment: 'prod'
           auto-merge: false
-          ref: ${{ github.ref_name }}
+          ref: ${{ env.tag_name }}
           required-contexts: 'checkReleaseCandidateJob'
       - name: Update deployment progress
         if: failure()
