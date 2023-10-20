@@ -31,7 +31,7 @@ jobs:
           echo $is_rc
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
       - name: remvoe-tag
-        if: steps.check-rc.outputs.isCandidate == 'false'
+        if: steps.check-rc.outputs.is-candidate == 'false'
         run: |
           git push --delete origin {{ github.ref_name }}
           core.setFailed('This commit is not release candidate')
