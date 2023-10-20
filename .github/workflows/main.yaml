@@ -31,7 +31,7 @@ jobs:
           echo $has_image
           echo "hasImage=$has_image" >> $GITHUB_OUTPUT
       - name: Output error summary
-        if: steps.image-status-check.outputs.status != 'success'
+        if: steps.image-status-check.outputs.hasImage != 'true'
         run: |
           echo "### This commit's image is not ready for deploy" >> $GITHUB_STEP_SUMMARY
           gh run cancel ${{ github.run_id }}

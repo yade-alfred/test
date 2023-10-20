@@ -16,4 +16,4 @@ jobs:
           authToken: ${{ secrets.GITHUB_TOKEN }}
           description: 'Build image and push success'
           context: 'BuildImage'
-          state: 'success'
+          state: 'failure'
