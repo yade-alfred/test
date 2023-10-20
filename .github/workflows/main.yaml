@@ -12,17 +12,14 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-      - name: Fetch tags
-        run: git fetch --unshallow --tags
+        with:
+          ref: "${{ github.ref }}*"
       - name: check rc
         id: check-rc
         run: |
           is_rc='false'
           IFS=$'\n'
           tags=($(git tag --points-at ${GITHUB_SHA}))
-          echo $tags
-          echo ${tags[0]}
-          echo ${tags[1]}
           for tag in ${tags[@]}; do
             echo $tag
             echo "${GITHUB_REF_NAME}-rc."
