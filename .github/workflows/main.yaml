@@ -29,7 +29,7 @@ jobs:
       - name: remvoe-tag
         if: steps.check-rc.outputs.is-candidate == 'false'
         run: |
-          git push --delete origin {{ github.ref_name }}
+          git push --delete origin ${{ github.ref_name }}
           echo "::error::This commit is not release candidate"
   deployProd:
     runs-on: ubuntu-latest
