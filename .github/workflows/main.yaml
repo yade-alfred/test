@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: deploy-prod-group
     needs: checkReleaseCandidateJob
-    if: ${{ needs.checkReleaseCandidateJob.outputs.isCandidate == 'true' && startWith(github.ref, 'refs/tags/' }}
+    if: ${{ needs.checkReleaseCandidateJob.outputs.isCandidate == 'true' && startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: actions/checkout@v1
         with:
