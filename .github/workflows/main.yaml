@@ -8,7 +8,7 @@ jobs:
   checkReleaseCandidate:
     runs-on: ubuntu-latest
     concurrency: deploy-prod-group
-    enviroment: prod
+    environment: prod
     outputs:
       isCandidate: ${{ steps.check-rc.outputs.isCandidate }}
     steps:
