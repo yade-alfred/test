@@ -13,7 +13,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
       - name: Fetch tags
-        run: git fetch --tags
+        run: git fetch --unshallow --tags
       - name: check rc
         id: check-rc
         run: |
@@ -27,11 +27,10 @@ jobs:
           done
           echo ${GITHUB_SHA}
           echo ${GITHUB_REF_NAME}
-          echo $(git tag --points-at 2ca3c1f9359ce7617110b6e3e69f9640046fa76f)
           git tag --points-at ${GITHUB_SHA}
           echo $tags
-          echo $tags[0]
-          echo $tags[1]
+          echo ${tags[0]}
+          echo ${tags[1]}
           echo $is_rc
           echo "is-candidate=$is_rc" >> "$GITHUB_OUTPUT"
   deployProd:
