@@ -99,7 +99,7 @@ jobs:
           environment: ${{ inputs.environment }}
           auto-merge: false
           ref: ${{ env.tag_name }}
-          required-contexts: 'checkReleaseCandidateJob'
+          required-contexts: 'BuildImage'
       - name: Update deployment progress
         if: failure()
         uses: chrnorm/deployment-status@v2
