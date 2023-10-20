@@ -4,6 +4,7 @@ on:
     inputs:
       environment:
         required: true
+        type: string
 env:
   tag_name: ${{ github.ref_name }}
 jobs:
