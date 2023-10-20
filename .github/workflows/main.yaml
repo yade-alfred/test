@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          ref: "${{ github.ref }}*"
+      - name: Fetch tags
+        run: git fetch origin tag ${{ github.ref_name}}*
       - name: check rc
         id: check-rc
         run: |
