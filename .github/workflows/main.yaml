@@ -30,6 +30,9 @@ jobs:
           done
           echo $has_image
           echo "hasImage=$has_image" >> $GITHUB_OUTPUT
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        if: steps.image-status-check.outputs.hasImage != 'true'
       - name: Output error summary
         if: steps.image-status-check.outputs.hasImage != 'true'
         env:
