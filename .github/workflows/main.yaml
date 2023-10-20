@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 jobs:
   deployProdJobs:
-    runs-on: ubuntu-latest
     uses: ./.github/workflows/deploy.yaml
     with:
       environment: prod
