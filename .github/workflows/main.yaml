@@ -51,7 +51,7 @@ jobs:
           environment: 'prod'
           auto-merge: false
           ref: ${{ github.ref_name }}
-          required-contexts: [ 'checkReleaseCandidate' ]
+          required-contexts: 'checkReleaseCandidate'
       - name: Deploy prod
         id: deploy-prod
         run: |
