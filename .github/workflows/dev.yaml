@@ -10,6 +10,6 @@ on:
 jobs:
   deployDevJobs:
     uses: ./.github/workflows/deploy.yaml
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && !startsWith(github.ref_name, 'hotfix') }}
     with:
       environment: dev
