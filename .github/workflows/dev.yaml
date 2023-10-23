@@ -8,6 +8,12 @@ on:
       - completed
   workflow_dispatch:
 jobs:
+  testJobs:
+  steps:
+    runs-on: ubuntu-latest
+    run: |
+      echo ${{ github.ref_name }}
+      echo ${{ github.ref }}
   deployDevJobs:
     uses: ./.github/workflows/deploy.yaml
     if: ${{ github.event.workflow_run.conclusion == 'success' && !startsWith(github.ref_name, 'hotfix') }}
