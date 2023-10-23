@@ -49,6 +49,7 @@ jobs:
           gh run watch ${{ github.run_id }}
   checkReleaseCandidateJob:
     runs-on: ubuntu-latest
+    environment: prod
     needs: checkImageExistsJob
     if: ${{ needs.checkImageExistsJob.outputs.hasImage == 'true' }}
     outputs:
