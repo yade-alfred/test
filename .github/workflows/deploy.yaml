@@ -1,4 +1,4 @@
-name: Validate and Deploy
+name: Deploy
 on:
   workflow_call:
     inputs:
@@ -50,6 +50,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: checkImageExistsJob
     if: ${{ needs.checkImageExistsJob.outputs.hasImage == 'true' }}
-    uses: ./.github/workflows/deploy.yaml
-    with:
-      environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
+    concurrency: deploy-${{ inputs.environment }}-group
+    steps:
+      - name: Deploy ${{ inputs.environment }}
+        id: deploy-step
+        run: |
+          echo "success"
