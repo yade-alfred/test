@@ -5,9 +5,45 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
+env:
+  tag_name: ${{ github.ref_name }}
 jobs:
-  # TODO without rc
+  checkReleaseCandidateJob:
+    runs-on: ubuntu-latest
+    outputs:
+      isCandidate: ${{ steps.check-rc.outputs.isCandidate }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.tag_name }}
+      - name: Fetch tags
+        run: git fetch origin tag ${{ env.tag_name }}*
+      - name: Check release candidate
+        id: check-rc
+        run: |
+          is_rc='false'
+          IFS=$'\n'
+          tags=($(git tag --points-at ${{ env.tag_name }}))
+          for tag in ${tags[@]}; do
+            if [[ $tag == "${{ env.tag_name }}-rc."* ]]; then
+              is_rc='true'
+            fi
+          done
+          echo "isCandidate=$is_rc" >> "$GITHUB_OUTPUT"
+      - name: Remvoe tag
+        if: steps.check-rc.outputs.isCandidate == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "### This commit is not release candidate" >> $GITHUB_STEP_SUMMARY
+          git push --delete origin ${{ env.tag_name }}
+          echo "Remove tag ${{ env.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
   deployProdJobs:
     uses: ./.github/workflows/deploy.yaml
+    needs: checkReleaseCandidateJob
+    if: ${{ needs.checkReleaseCandidateJob.outputs.isCandidate == 'true' }}
     with:
       environment: prod
