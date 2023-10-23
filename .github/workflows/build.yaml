@@ -18,7 +18,11 @@ jobs:
           description: 'Build image and push success'
           context: 'BuildImage'
           state: 'success'
-      - name: Output error summary and remove tag
+      - name: Trigger deploy dev pre
+        run: |
+          echo ${{ github.ref_name }}
+          echo ${{ github.ref }}
+      - name: Trigger deploy dev
         if: ${{ success() && !startsWith(github.ref_name, 'hotfix') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
