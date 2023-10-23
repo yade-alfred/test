@@ -1,4 +1,4 @@
-name: Build Image and push
+name: Build Image and Push
 run-name: "Build image and push"
 on:
   push:

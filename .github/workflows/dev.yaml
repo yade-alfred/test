@@ -1,0 +1,15 @@
+name: Deploy Dev
+run-name: "Deploy Dev"
+on:
+  workflow_run:
+    workflows:
+      - Build Image and Push
+    types:
+      - completed
+  workflow_dispatch:
+jobs:
+  deployDevJobs:
+    uses: ./.github/workflows/deploy.yaml
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    with:
+      environment: dev
