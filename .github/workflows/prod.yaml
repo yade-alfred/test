@@ -10,7 +10,7 @@ env:
 jobs:
   checkReleaseCandidateJob:
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') && !contains(github.ref_name, 'rc') }}
     outputs:
       isCandidate: ${{ steps.check-rc.outputs.isCandidate }}
     steps:
