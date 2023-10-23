@@ -3,6 +3,7 @@ run-name: "Deploy Prod: ${{ github.ref_name }}"
 on:
   push:
     tags:
+      - 'hotfix-[0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
 env:
