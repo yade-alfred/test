@@ -8,6 +8,7 @@ on:
       TEST:
         required: false
         type: string
+        default: ${{ github.sha }}
 env:
   IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
 jobs:
