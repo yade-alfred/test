@@ -7,3 +7,4 @@ jobs:
     uses: ./.github/workflows/deploy.yaml
     with:
       ENVIRONMENT: dev
+      TEST: aaa
