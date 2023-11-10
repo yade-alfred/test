@@ -8,6 +8,9 @@ on:
 jobs:
   buildImageJob:
     runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+      actions: write
     steps:
       - uses: actions/checkout@v4
       - name: Run the action # You would run your tests before this using the output to set state/desc

@@ -48,4 +48,4 @@ jobs:
     needs: checkReleaseCandidateJob
     if: ${{ needs.checkReleaseCandidateJob.outputs.isCandidate == 'true' }}
     with:
-      environment: prod
+      ENVIRONMENT: prod
