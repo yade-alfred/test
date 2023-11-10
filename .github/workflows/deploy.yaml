@@ -13,7 +13,6 @@ env:
 jobs:
   checkImageExistsJob:
     runs-on: ubuntu-latest
-    if: ${{ inputs.TEST }}
     permissions:
       statuses: read
       actions: write
@@ -37,6 +36,7 @@ jobs:
               has_image='true'
             fi
           done
+          echo ${{ inputs.TEST && format('hello {0} bb {1}', inputs.TEST, 'b') || 'CCC' }}
           echo "hasImage=$has_image" >> $GITHUB_OUTPUT
       - name: Checkout source code
         if: ${{ env.IS_TAG && steps.image-status-check.outputs.hasImage != 'true' }}
