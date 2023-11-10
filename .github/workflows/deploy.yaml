@@ -5,11 +5,15 @@ on:
       ENVIRONMENT:
         required: true
         type: string
+      TEST:
+        required: false
+        type: string
 env:
-  is_tag: ${{ startsWith(github.ref, 'refs/tags/') }}
+  IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
 jobs:
   checkImageExistsJob:
     runs-on: ubuntu-latest
+    if: ${{ inputs.TEST }}
     permissions:
       statuses: read
       actions: write
@@ -35,12 +39,12 @@ jobs:
           done
           echo "hasImage=$has_image" >> $GITHUB_OUTPUT
       - name: Checkout source code
-        if: ${{ env.is_tag && steps.image-status-check.outputs.hasImage != 'true' }}
+        if: ${{ env.IS_TAG && steps.image-status-check.outputs.hasImage != 'true' }}
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: Output error summary and remove tag
-        if: ${{ env.is_tag && steps.image-status-check.outputs.hasImage != 'true' }}
+        if: ${{ env.IS_TAG && steps.image-status-check.outputs.hasImage != 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -59,4 +63,4 @@ jobs:
       - name: Deploy ${{ inputs.ENVIRONMENT }}
         id: deploy-step
         run: |
-          echo "success ${{ vars.TEST_VAR }}"
+          echo "success"
