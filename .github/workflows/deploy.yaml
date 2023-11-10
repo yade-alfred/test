@@ -59,4 +59,4 @@ jobs:
       - name: Deploy ${{ inputs.ENVIRONMENT }}
         id: deploy-step
         run: |
-          echo "success {{ vars.TEST_VAR }}"
+          echo "success ${{ vars.TEST_VAR }}"
