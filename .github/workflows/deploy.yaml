@@ -8,7 +8,7 @@ on:
       TEST:
         required: false
         type: string
-        default: ${{ github.sha }}
+        default: ${{ vars.TEST }}
 env:
   IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
 jobs:
@@ -37,7 +37,6 @@ jobs:
               has_image='true'
             fi
           done
-          echo ${{ inputs.TEST && format('hello {0} bb {1}', inputs.TEST, 'b') || 'CCC' }}
           echo "hasImage=$has_image" >> $GITHUB_OUTPUT
       - name: Checkout source code
         if: ${{ env.IS_TAG && steps.image-status-check.outputs.hasImage != 'true' }}
@@ -65,3 +64,5 @@ jobs:
         id: deploy-step
         run: |
           echo "success"
+          echo ${{ inputs.TEST }}
+          echo "OK"
