@@ -13,6 +13,7 @@ env:
 jobs:
   checkImageExistsJob:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
     permissions:
       statuses: read
       actions: write
