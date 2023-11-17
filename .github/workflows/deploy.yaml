@@ -13,12 +13,13 @@ env:
 jobs:
   checkImageExistsJob:
     runs-on: ubuntu-latest
-    concurrency: deploy-${{ inputs.ENVIRONMENT }}-group
+    environment: ${{ inputs.ENVIRONMENT }}
     permissions:
       statuses: read
       actions: write
     outputs:
       hasImage: ${{ steps.image-status-check.outputs.hasImage }}
+      testOutput: ${{ vars.TEST_VAR }}
     steps:
       - name: Check image status
         id: image-status-check
@@ -64,7 +65,7 @@ jobs:
         id: deploy-step
         run: |
           echo "success"
-          echo ${{ inputs.TEST || vars.TEST_VAR }}
+          echo ${{ needs.checkImageExistsJob.testOutput }}
           echo "OK"
           echo ${{ vars.TEST_VAR }}
           echo "OK2"
