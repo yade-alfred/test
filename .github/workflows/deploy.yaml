@@ -65,7 +65,7 @@ jobs:
         id: deploy-step
         run: |
           echo "success"
-          echo ${{ needs.checkImageExistsJob.testOutput }}
+          echo ${{ needs.checkImageExistsJob.outputs.testOutput }}
           echo "OK"
           echo ${{ vars.TEST_VAR }}
           echo "OK2"
