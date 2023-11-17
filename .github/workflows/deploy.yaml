@@ -58,7 +58,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: checkImageExistsJob
     if: ${{ needs.checkImageExistsJob.outputs.hasImage == 'true' }}
-    environment: ${{ inputs.ENVIRONMENT }}
     concurrency: deploy-${{ inputs.ENVIRONMENT }}-group
     steps:
       - name: Deploy ${{ inputs.ENVIRONMENT }}
