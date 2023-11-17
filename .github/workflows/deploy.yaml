@@ -19,7 +19,7 @@ jobs:
       actions: write
     outputs:
       hasImage: ${{ steps.image-status-check.outputs.hasImage }}
-      testOutput: ${{ vars.TEST_VAR }}
+      aws-role: ${{ vars.TEST_VAR }}
     steps:
       - name: Check image status
         id: image-status-check
@@ -64,7 +64,7 @@ jobs:
         id: deploy-step
         run: |
           echo "success"
-          echo ${{ needs.checkImageExistsJob.outputs.testOutput }}
+          echo ${{ needs.checkImageExistsJob.outputs.aws-role }}
           echo "OK"
           echo ${{ vars.TEST_VAR }}
           echo "OK2"
