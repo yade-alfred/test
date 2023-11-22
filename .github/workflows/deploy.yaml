@@ -5,9 +5,9 @@ on:
       ENVIRONMENT:
         required: true
         type: string
-      TEST:
+    secrets:
+      TEST_SEC:
         required: false
-        type: string
 env:
   IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
 jobs:
@@ -68,3 +68,11 @@ jobs:
           echo "OK"
           echo ${{ vars.TEST_VAR }}
           echo "OK2"
+      - name: Set env as secret
+        env:
+          MY_VAL: ${{ secrets.TEST_SEC }}
+        run: |
+          import os
+          for q in (os.getenv("MY_VAL")):
+            print(q)
+        shell: python

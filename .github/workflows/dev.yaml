@@ -7,3 +7,5 @@ jobs:
     uses: ./.github/workflows/deploy.yaml
     with:
       ENVIRONMENT: Dev
+    secrets:
+      TEST_SEC: ${{ secrets.TEST_SEC }}
