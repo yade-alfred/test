@@ -61,17 +61,7 @@ jobs:
     concurrency: deploy-${{ inputs.ENVIRONMENT }}-group
     steps:
       - name: Deploy ${{ inputs.ENVIRONMENT }}
-        if: ${{ inputs.ENVIRONMENT == 'dev' }}
         id: deploy-step
-        run: |
-          echo "success"
-          echo ${{ needs.checkImageExistsJob.outputs.aws-role }}
-          echo "OK"
-          echo ${{ vars.TEST_VAR }}
-          echo "OK2"
-      - name: Deploy ${{ inputs.ENVIRONMENT }} - ifnot
-        if: ${{ inputs.ENVIRONMENT != 'dev'}}
-        id: deploy-step2
         run: |
           echo "success"
           echo ${{ needs.checkImageExistsJob.outputs.aws-role }}
