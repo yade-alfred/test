@@ -71,7 +71,7 @@ jobs:
           echo "OK2"
       - name: Deploy ${{ inputs.ENVIRONMENT }} - ifnot
         if: ${{ inputs.ENVIRONMENT }} != 'dev'
-        id: deploy-step
+        id: deploy-step2
         run: |
           echo "success"
           echo ${{ needs.checkImageExistsJob.outputs.aws-role }}
