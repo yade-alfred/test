@@ -61,7 +61,7 @@ jobs:
     concurrency: deploy-${{ inputs.ENVIRONMENT }}-group
     steps:
       - name: Deploy ${{ inputs.ENVIRONMENT }}
-        if: ${{ inputs.ENVIRONMENT }} == 'dev'
+        if: ${{ inputs.ENVIRONMENT == 'dev' }}
         id: deploy-step
         run: |
           echo "success"
@@ -70,7 +70,7 @@ jobs:
           echo ${{ vars.TEST_VAR }}
           echo "OK2"
       - name: Deploy ${{ inputs.ENVIRONMENT }} - ifnot
-        if: ${{ inputs.ENVIRONMENT }} != 'dev'
+        if: ${{ inputs.ENVIRONMENT != 'dev'}}
         id: deploy-step2
         run: |
           echo "success"
