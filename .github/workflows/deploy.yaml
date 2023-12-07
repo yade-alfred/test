@@ -6,7 +6,7 @@ on:
         required: true
         type: string
     secrets:
-      TEST_SEC:
+      ARGO_TOKEN:
         required: false
 env:
   IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
@@ -76,3 +76,12 @@ jobs:
           for q in (os.getenv("MY_VAL")):
             print(q)
         shell: python
+  waitDeploySuccessJob:
+    uses: ./.github/workflows/wait-deploy.yml
+    with:
+      ARGO_HOST: 'argocd.alfred-internal-dev.com'
+      ARGO_APP_NAME: 'api-server-playground-reliability'
+      RETRY_TIMES: 3
+      RETRY_WAIT: 10
+    secrets:
+      ARGO_TOKEN: ${{ secrets.ARGO_TOKEN }}

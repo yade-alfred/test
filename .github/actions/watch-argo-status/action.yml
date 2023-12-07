@@ -1,0 +1,42 @@
+name: watch ArgoCD application status
+inputs:
+  ARGO_HOST:
+    required: true
+  ARGO_APP_NAME:
+    required: true
+  RETRY_TIMES:
+    required: true
+  RETRY_WAIT:
+    required: true
+  ARGO_TOKEN:
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Delay
+      uses: GuillaumeFalourd/wait-sleep-action@v1
+      with:
+        time: ${{ inputs.RETRY_WAIT }}
+    - name: Get Argo application status
+      id: get-argo-status
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: 'https://${{ inputs.ARGO_HOST }}/api/v1/applications/${{ inputs.ARGO_APP_NAME }}'
+        method: 'GET'
+        bearerToken: ${{ inputs.ARGO_TOKEN }}
+    - name: Subtract RETRY_TIMES
+      id: subtract-retry-times
+      shell: bash
+      run:
+        echo "NEW_RETRY_TIMES=$(expr ${{ inputs.RETRY_TIMES }}) - 1" >> "$GITHUB_OUTPUT"
+    - name: Check Argo status
+      if: ${{ steps.subtract-retry-times.outputs.NEW_RETRY_TIMES > 0 && (fromJson(steps.get-argo-status.outputs.response).status.summary.images[1] != null || fromJson(steps.get-argo-status.outputs.response).status.sync.status != 'Synced') }}
+      uses: yade-alfred/test/.github/actions/watch-argo-status@main
+      with:
+        ARGO_HOST: ${{ inputs.ARGO_HOST }}
+        ARGO_APP_NAME: ${{ inputs.ARGO_APP_NAME }}
+        RETRY_TIMES: ${{ steps.subtract-retry-times.outputs.NEW_RETRY_TIMES }}
+        RETRY_WAIT: ${{ inputs.RETRY_WAIT }}
+        ARGO_TOKEN: ${{ inputs.ARGO_TOKEN }}
+
+

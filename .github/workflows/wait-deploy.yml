@@ -1,0 +1,41 @@
+name: Wait ArgoCD deploy success
+on:
+  workflow_call:
+    inputs:
+      ARGO_HOST:
+        required: true
+        type: string
+      ARGO_APP_NAME:
+        required: true
+        type: string
+      RETRY_TIMES:
+        required: false
+        type: number
+        default: 3
+      RETRY_WAIT:
+        required: false
+        type: number
+        default: 6
+    secrets:
+      ARGO_TOKEN:
+        required: true
+jobs:
+  waitDeploySuccessJob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh Argo application
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://${{ inputs.ARGO_HOST }}/api/v1/applications/${{ inputs.ARGO_APP_NAME }}?refresh=true'
+          method: 'GET'
+          bearerToken: ${{ secrets.ARGO_TOKEN }}
+      - name: Check Argo status
+        uses: yade-alfred/test/.github/actions/watch-argo-status@main
+        with:
+          ARGO_HOST: ${{ inputs.ARGO_HOST }}
+          ARGO_APP_NAME: ${{ inputs.ARGO_APP_NAME }}
+          RETRY_TIMES: ${{ inputs.RETRY_TIMES }}
+          RETRY_WAIT: ${{ inputs.RETRY_WAIT }}
+          ARGO_TOKEN: ${{ secrets.ARGO_TOKEN }}
+
+

@@ -8,4 +8,4 @@ jobs:
     with:
       ENVIRONMENT: Dev
     secrets:
-      TEST_SEC: ${{ secrets.TEST_SEC }}
+      ARGO_TOKEN: ${{ secrets.ARGO_TOKEN }}
