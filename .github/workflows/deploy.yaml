@@ -86,9 +86,15 @@ jobs:
     secrets:
       ARGO_TOKEN: ${{ secrets.ARGO_TOKEN }}
   showDeploySuccessJob:
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     needs: waitDeploySuccessJob
     steps:
       - name: show success
+        if: ${{ success() }}
+        run: |
+          echo ${{ needs.waitDeploySuccessJob.outputs.isDeploySuccess }}
+      - name: show failure
+        if: ${{ failure() }}
         run: |
           echo ${{ needs.waitDeploySuccessJob.outputs.isDeploySuccess }}
