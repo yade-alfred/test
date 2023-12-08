@@ -3,12 +3,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
-
 jobs:
   showParentCommitJob:
     runs-on: ubuntu-latest
@@ -17,6 +11,12 @@ jobs:
         with:
           fetch-depth: 2
       - name: getParentCommit
+        id: get-commit
         run: |
           echo ${{ github.sha }}
-          git rev-parse ${{ github.sha }}^
+          (git rev-parse ${{ github.sha }}^
+          echo "parentCommit=$(git rev-parse ${{ github.sha }}^)" >> $GITHUB_OUTPUT
+      - name: echo commit
+        run: |
+          echo ${{ steps.get-commit.outputs.parentCommit }}
+
