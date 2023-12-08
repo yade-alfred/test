@@ -85,3 +85,10 @@ jobs:
       RETRY_WAIT: 10
     secrets:
       ARGO_TOKEN: ${{ secrets.ARGO_TOKEN }}
+  showDeploySuccessJob:
+    runs-on: ubuntu-latest
+    needs: waitDeploySuccessJob
+    steps:
+      - name: show success
+        run: |
+          echo ${{ needs.waitDeploySuccessJob.outputs.isDeploySuccess }}

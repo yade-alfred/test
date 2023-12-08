@@ -11,17 +11,24 @@ on:
       RETRY_TIMES:
         required: false
         type: number
-        default: 3
+        default: 12
       RETRY_WAIT:
         required: false
         type: number
-        default: 6
+        default: 10
     secrets:
       ARGO_TOKEN:
         required: true
+    outputs:
+      isDeploySuccess:
+        value: ${{ jobs.waitDeploySuccessJob.outputs.isDeploySuccess }}
 jobs:
   waitDeploySuccessJob:
     runs-on: ubuntu-latest
+    outputs:
+      isDeploySuccess: ${{ steps.check-argo-status.outputs.isDeploySuccess }}
+    permissions:
+      statuses: write
     steps:
       - name: Refresh Argo application
         uses: fjogeleit/http-request-action@v1
@@ -30,12 +37,28 @@ jobs:
           method: 'GET'
           bearerToken: ${{ secrets.ARGO_TOKEN }}
       - name: Check Argo status
-        uses: yade-alfred/test/.github/actions/watch-argo-status@main
+        id: check-argo-status
+        run: |
+          is_deploy_success='false'
+          for i in {1..${{ inputs.RETRY_TIMES }}};
+          do
+            sleep ${{ inputs.RETRY_WAIT }}
+            result=$(curl -H "Authorization: Bearer ${{ secrets.ARGO_TOKEN }}" "https://${{ inputs.ARGO_HOST }}/api/v1/applications/${{ inputs.ARGO_APP_NAME }}")
+            sync_status=$(echo $result | jq -r '.status.sync.status')
+            pod_image_count=$(echo $result | jq -r '.status.summary.images | length')
+            echo "sync_status=$sync_status, pod_image_count=$pod_image_count"
+            if [[ $sync_status == "Synced" && $pod_image_count == 1 ]]; then
+              is_deploy_success='true'
+              break
+            fi
+          done
+          echo $is_deploy_success
+          echo "isDeploySuccess=$is_deploy_success" >> $GITHUB_OUTPUT
+      - name: Run the action # You would run your tests before this using the output to set state/desc
+        if: success()
+        uses: Sibz/github-status-action@v1
         with:
-          ARGO_HOST: ${{ inputs.ARGO_HOST }}
-          ARGO_APP_NAME: ${{ inputs.ARGO_APP_NAME }}
-          RETRY_TIMES: ${{ inputs.RETRY_TIMES }}
-          RETRY_WAIT: ${{ inputs.RETRY_WAIT }}
-          ARGO_TOKEN: ${{ secrets.ARGO_TOKEN }}
-
-
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          description: 'Build image and push success, but testing failure'
+          context: 'BuildImage'
+          state: 'failure'
