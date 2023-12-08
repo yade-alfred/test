@@ -8,6 +8,7 @@ on:
       - main
     types:
       - closed
+
 jobs:
   showParentCommitJob:
     runs-on: ubuntu-latest
