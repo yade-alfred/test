@@ -1,0 +1,19 @@
+name: merge pr
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+jobs:
+  showParentCommitJob:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: getParentCommit
+        run: |
+          echo ${{ github.sha }}
+          git rev-parse ${{ github.sha }}^
