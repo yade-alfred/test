@@ -54,6 +54,7 @@ jobs:
           done
           echo $is_deploy_success
           echo "isDeploySuccess=$is_deploy_success" >> $GITHUB_OUTPUT
+          exit 1
       - name: Run the action # You would run your tests before this using the output to set state/desc
         if: success()
         uses: Sibz/github-status-action@v1
